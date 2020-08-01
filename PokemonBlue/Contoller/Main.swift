@@ -6,9 +6,11 @@
 //  Copyright © 2020 JediWattson. All rights reserved.
 //
 
+import AVFoundation
 import UIKit
 
 class MainController: UIViewController {
+    var themeSong: AVAudioPlayer?
     var tableView: UITableView?
     var pokemonFetches: [NameLink] = [] {
         didSet {
@@ -30,6 +32,16 @@ class MainController: UIViewController {
     }
     
     private func setup(){
+        let path = Bundle.main.path(forResource: "Pokemon", ofType: "mp3")!
+        let url = URL(fileURLWithPath: path)
+
+        do {
+            themeSong = try AVAudioPlayer(contentsOf: url)
+            //themeSong?.play()
+        } catch {
+            print(error)
+        }
+        
         self.view.backgroundColor = .white
         
         let table = UITableView(frame: .zero)
@@ -66,6 +78,8 @@ extension MainController: UITableViewDataSource {
         
         let url = pokemonFetches[indexPath.row].url
 
+        cell.clearCell()
+        
         NetworkManager.shared.fetchPokemon(url){pokemon in
             guard
                 var pokemon = pokemon,

@@ -53,9 +53,15 @@ class Cell: UITableViewCell {
         
     }
     
+    func clearCell() {
+        let named: String = "MissingNo."
+        self.sprite?.image = UIImage(named: named)
+        self.name?.text = named
+    }
+    
     func setCell(_ pokemon: Pokemon){
         self.sprite?.image = pokemon.image
-        self.name?.text = pokemon.name
+        self.name?.text = pokemon.name.capitalizingFirstLetter()
         self.setTypes(types: pokemon.types)
     }
     
@@ -67,7 +73,7 @@ class Cell: UITableViewCell {
         let nameLabel = UILabel(frame: .zero)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textAlignment = .center
-        guard let pokeFont = UIFont(name: "PokemonHollowNormal", size: 35) else {
+        guard let pokeFont = UIFont(name: "PokemonHollowNormal", size: 33) else {
             print("YOU NEED TO GET THE POKEMONS")
             return
             

@@ -38,6 +38,7 @@ extension NetworkManager {
             } catch {
                 print(error)
             }
+            
             completion(nil)
         }.resume()
         
