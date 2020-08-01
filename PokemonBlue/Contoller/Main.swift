@@ -20,7 +20,7 @@ class MainController: UIViewController {
         }
     }
     var pokemonFetched: [Pokemon] = []
-    var limit: Int = 30
+    var limit: Int = 25
     var nextPage: String = "https://pokeapi.co/api/v2/pokemon?offset=0&limit="
     var previousPage: String?
 
@@ -49,6 +49,8 @@ class MainController: UIViewController {
         
         table.delegate = self
         table.dataSource = self
+        table.prefetchDataSource = self
+        
         table.register(Cell.self, forCellReuseIdentifier: Cell.reuseId)
         
         self.view.addSubview(table)
@@ -58,8 +60,8 @@ class MainController: UIViewController {
     
     func fetchPokemonList(url: String){
         NetworkManager.shared.fetchPokemonList(url){ pokemon in
-            self.previousPage = pokemon?.previous ?? ""
-            self.nextPage = pokemon?.next ?? ""
+            self.previousPage = pokemon?.previous ?? self.previousPage
+            self.nextPage = pokemon?.next ?? self.nextPage
             guard let results = pokemon?.results else { return }
             self.pokemonFetches.append(contentsOf: results)
             
@@ -102,8 +104,14 @@ extension MainController: UITableViewDataSource {
 
 }
 
-
-
 extension MainController: UITableViewDelegate {
     
+}
+
+extension MainController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        let lastCellIndexPath = IndexPath(row: self.pokemonFetches.count - 1, section: 0)
+        guard self.pokemonFetches.count < 151 - self.limit && indexPaths.contains(lastCellIndexPath) else { return }
+        self.fetchPokemonList(url: self.nextPage)
+    }
 }

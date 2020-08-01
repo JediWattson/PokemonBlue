@@ -57,6 +57,7 @@ class Cell: UITableViewCell {
         let named: String = "MissingNo."
         self.sprite?.image = UIImage(named: named)
         self.name?.text = named
+        self.hStackType?.removeFromSuperview()
     }
     
     func setCell(_ pokemon: Pokemon){
