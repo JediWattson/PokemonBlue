@@ -21,6 +21,7 @@
 		0C27F30A24D5DAB800F3218C /* PokemonHollowNormal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0C27F30924D5DAB800F3218C /* PokemonHollowNormal.ttf */; };
 		0C27F30D24D5EB7200F3218C /* Pokemon.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0C27F30C24D5EB7200F3218C /* Pokemon.mp3 */; };
 		0C27F31224D5EE5900F3218C /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C27F31124D5EE5900F3218C /* String+Utils.swift */; };
+		0C27F31424D63D6C00F3218C /* Details.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C27F31324D63D6C00F3218C /* Details.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		0C27F30924D5DAB800F3218C /* PokemonHollowNormal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PokemonHollowNormal.ttf; sourceTree = "<group>"; };
 		0C27F30C24D5EB7200F3218C /* Pokemon.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Pokemon.mp3; sourceTree = "<group>"; };
 		0C27F31124D5EE5900F3218C /* String+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Utils.swift"; sourceTree = "<group>"; };
+		0C27F31324D63D6C00F3218C /* Details.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				0C27F2F424D50F9100F3218C /* Cell.swift */,
+				0C27F31324D63D6C00F3218C /* Details.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -225,6 +228,7 @@
 				0C27F2FB24D5111E00F3218C /* Pokemon.swift in Sources */,
 				0C27F2DE24D50ADA00F3218C /* ViewController.swift in Sources */,
 				0C27F2F824D510F300F3218C /* UIView+Utils.swift in Sources */,
+				0C27F31424D63D6C00F3218C /* Details.swift in Sources */,
 				0C27F2DA24D50ADA00F3218C /* AppDelegate.swift in Sources */,
 				0C27F2EF24D50BC700F3218C /* Main.swift in Sources */,
 				0C27F2DC24D50ADA00F3218C /* SceneDelegate.swift in Sources */,

@@ -105,7 +105,12 @@ extension MainController: UITableViewDataSource {
 }
 
 extension MainController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let index = indexPath.row
+        let detail = Details(pokemon: self.pokemonFetched[index])
+        self.navigationController?.pushViewController(detail, animated: true)
+    }
 }
 
 extension MainController: UITableViewDataSourcePrefetching {
