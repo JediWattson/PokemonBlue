@@ -9,12 +9,41 @@
 import UIKit
 
 class Details: UIViewController {
-    var sprite: UIImageView?
-    var name: UILabel?
-    var typeLabels: [UILabel]?
-    var vStack: UIStackView?
-    var hStackType: UIStackView?
     var pokemon: Pokemon?
+    lazy var vStackContainer: UIStackView = {
+        let vStack = UIStackView(frame: .zero)
+        vStack.translatesAutoresizingMaskIntoConstraints = false
+        vStack.distribution = .fill
+        vStack.axis = .vertical
+        return vStack
+    }()
+    
+    lazy var hStackTypes: UIStackView = {
+        let hStack = UIStackView(frame: .zero)
+        hStack.distribution = .fillEqually
+        hStack.axis = .horizontal
+        hStack.spacing = 16
+        return hStack
+    }()
+    
+    lazy var nameLabel: UILabel = {
+        let nameLabel = UILabel(frame: .zero)
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.textAlignment = .center
+        guard let pokeFont = UIFont(name: "PokemonHollowNormal", size: 33) else {
+            print("YOU NEED TO GET THE POKEMONS")
+            return nameLabel
+        }
+        nameLabel.font = pokeFont
+        return nameLabel
+    }()
+    
+    lazy var mainImage: UIImageView = {
+        let image = UIImageView(frame: .zero)
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.contentMode = .scaleAspectFit
+        return image
+    }()
     
     init(pokemon: Pokemon) {
         super.init(nibName: nil, bundle: nil)
@@ -29,62 +58,104 @@ class Details: UIViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         guard let pokemon = self.pokemon else { return }
-        let image = UIImageView(frame: .zero)
-        image.translatesAutoresizingMaskIntoConstraints = false
-        image.contentMode = .scaleAspectFit
-        image.image = pokemon.image
 
-        let nameLabel = UILabel(frame: .zero)
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.textAlignment = .center
-        guard let pokeFont = UIFont(name: "PokemonHollowNormal", size: 33) else {
-            print("YOU NEED TO GET THE POKEMONS")
-            return
-        }
-        nameLabel.font = pokeFont
+        mainImage.image = pokemon.image
         nameLabel.text = pokemon.name
+        
+        vStackContainer.addArrangedSubview(nameLabel)
+        vStackContainer.addArrangedSubview(mainImage)
+        
+        self.setupType()
+        self.setupScroll()
+        
+        self.view.addSubview(vStackContainer)
 
-
-        let vStack0 = UIStackView(frame: .zero)
-        vStack0.translatesAutoresizingMaskIntoConstraints = false
-        vStack0.distribution = .fillProportionally
-        vStack0.axis = .vertical
-        vStack0.addArrangedSubview(nameLabel)
-        vStack0.addArrangedSubview(image)
-
-        var typeLabels: [UILabel] = []
-        let hStack = UIStackView(frame: .zero)
-        hStack.translatesAutoresizingMaskIntoConstraints = false
-        hStack.distribution = .fillEqually
-        hStack.axis = .horizontal
-        hStack.spacing = 16
-
+        guard let safeArea = self.view?.safeAreaLayoutGuide else { return }
+        nameLabel.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        vStackContainer.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8).isActive = true
+        vStackContainer.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8).isActive = true
+        vStackContainer.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8).isActive = true
+        vStackContainer.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -8).isActive = true
+    }
+    
+    private func setupType() {
+        guard let pokemon = self.pokemon else { return }
         pokemon.types.forEach { val in
             guard let bgColor = TypeColors.shared.getColor(type: val.type.name) else {return}
             let label = UILabel(frame: .zero)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.text = val.type.name
-            label.textColor = UIColor.white
+            label.textColor = .white
             label.textAlignment = .center
             label.layer.backgroundColor = bgColor.cgColor
             label.layer.cornerRadius = 22
-            typeLabels.append(label)
-            hStack.addArrangedSubview(label)
+            hStackTypes.addArrangedSubview(label)
             label.heightAnchor.constraint(equalToConstant: 50).isActive = true
         }
+        vStackContainer.addArrangedSubview(hStackTypes)
+    }
+    
+    private func setupScroll(){
+        guard let pokemon = pokemon else { return }
+        let hStackScrolls = UIStackView(frame: .zero)
+        hStackScrolls.translatesAutoresizingMaskIntoConstraints = false
+        hStackScrolls.axis = .horizontal
+        hStackScrolls.distribution = .fillProportionally
 
-        vStack0.addArrangedSubview(hStack)
-
-        self.view.addSubview(vStack0)
-
-        guard let safeArea = self.view?.safeAreaLayoutGuide else { return }
+        let scrollMoves = genScroll("Moves", arr: pokemon.moves.map{$0.move.name})
+        let scrollAbilities = genScroll("Abilites", arr: pokemon.abilities.map{$0.ability.name})
+        hStackScrolls.addArrangedSubview(scrollMoves)
+        hStackScrolls.addArrangedSubview(scrollAbilities)
+        vStackContainer.addArrangedSubview(hStackScrolls)
+    }
+    
+    private func genScroll(_ titleString: String, arr: [String]) -> UIStackView {
+        let vStackScroll = UIStackView(frame: .zero)
+        vStackScroll.translatesAutoresizingMaskIntoConstraints = false
+        vStackScroll.axis = .vertical
+        vStackScroll.distribution = .fill
+        vStackScroll.spacing = 8
         
-        vStack0.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8).isActive = true
-        vStack0.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8).isActive = true
-        vStack0.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8).isActive = true
-        vStack0.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -8).isActive = true
-        
-        self.vStack = vStack0
+        let title = UILabel(frame: .zero)
+        title.translatesAutoresizingMaskIntoConstraints = false
+        title.text = titleString
+        title.textAlignment = .center
+        title.font = UIFont.boldSystemFont(ofSize: 22)
 
+        
+        let vStackMoves = UIStackView(frame: .zero)
+        vStackMoves.translatesAutoresizingMaskIntoConstraints = false
+        vStackMoves.axis = .vertical
+        vStackMoves.distribution = .fill
+
+        let frame = self.view.safeAreaLayoutGuide.layoutFrame
+        arr.forEach{ val in
+            let label = UILabel(frame: .zero)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.text = val
+            label.textAlignment = .center
+            vStackMoves.addArrangedSubview(label)
+
+            label.heightAnchor.constraint(equalToConstant: 20).isActive = true
+            label.widthAnchor.constraint(equalToConstant: frame.width/2).isActive = true
+        }
+
+        let contentViewSize = CGSize(width: frame.width/2, height: CGFloat(arr.count*20))
+        let scroll = UIScrollView(frame: .zero)
+        scroll.frame = self.view.bounds
+        scroll.contentSize = contentViewSize
+        scroll.autoresizingMask = .flexibleHeight
+        scroll.bounces = true
+
+        let container = UIView()
+        container.frame.size = contentViewSize
+         
+        container.addSubview(vStackMoves)
+        scroll.addSubview(container)
+        
+        vStackScroll.addArrangedSubview(title)
+        vStackScroll.addArrangedSubview(scroll)
+        
+        return vStackScroll
     }
 }
