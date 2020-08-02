@@ -19,7 +19,7 @@ class MainController: UIViewController {
             }
         }
     }
-    var pokemonFetched: [Pokemon] = []
+    var pokemonFetched: [String: Pokemon] = [:]
     var limit: Int = 25
     var nextPage: String = "https://pokeapi.co/api/v2/pokemon?offset=0&limit="
     var previousPage: String?
@@ -59,11 +59,15 @@ class MainController: UIViewController {
     }
     
     func fetchPokemonList(url: String){
-        NetworkManager.shared.fetchPokemonList(url){ pokemon in
-            self.previousPage = pokemon?.previous ?? self.previousPage
-            self.nextPage = pokemon?.next ?? self.nextPage
-            guard let results = pokemon?.results else { return }
-            self.pokemonFetches.append(contentsOf: results)
+        NetworkManager.shared.fetchPokemonList(url){ result in
+            switch result {
+            case .success(let pokemon):
+                self.previousPage = pokemon.previous ?? self.previousPage
+                self.nextPage = pokemon.next ?? self.nextPage
+                self.pokemonFetches.append(contentsOf: pokemon.results)
+            case .failure(let error):
+                self.presentAlert(error: error)
+            }
             
         }
     }
@@ -82,19 +86,24 @@ extension MainController: UITableViewDataSource {
 
         cell.clearCell()
         
-        NetworkManager.shared.fetchPokemon(url){pokemon in
-            guard
-                var pokemon = pokemon,
-                let frontDefault = pokemon.sprites.frontDefault
-            else {return}
-
-            NetworkManager.shared.fetchSprite(frontDefault){ image in
-                guard let image = image else {return}
-                pokemon.image = image
-                self.pokemonFetched.append(pokemon)
-                DispatchQueue.main.async {
-                    cell.setCell(pokemon)
+        NetworkManager.shared.fetchPokemon(url){result in
+            switch result {
+            case .success(var pokemon):
+                guard let frontDefault = pokemon.sprites.frontDefault else {return}
+                NetworkManager.shared.fetchSprite(frontDefault){ result in
+                    switch result {
+                    case .success(let image):
+                        pokemon.image = image
+                        self.pokemonFetched[pokemon.name] = pokemon
+                        DispatchQueue.main.async {
+                            cell.setCell(pokemon)
+                        }
+                    case .failure(let error):
+                        self.presentAlert(error: error)
+                    }
                 }
+            case .failure(let error):
+                self.presentAlert(error: error)
             }
         }
         
@@ -107,8 +116,9 @@ extension MainController: UITableViewDataSource {
 extension MainController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let index = indexPath.row
-        let detail = Details(pokemon: self.pokemonFetched[index])
+        let name = self.pokemonFetches[indexPath.row].name
+        guard let pokemon = self.pokemonFetched[name] else {return}
+        let detail = Details(pokemon: pokemon)
         self.navigationController?.pushViewController(detail, animated: true)
     }
 }

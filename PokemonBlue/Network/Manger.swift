@@ -8,6 +8,10 @@
 
 import UIKit
 
+typealias ListHandler = (Result<PokemonList, NetworkError>) -> ()
+typealias imgHandler = (Result<UIImage, NetworkError>) -> ()
+typealias PokemonTrainer = (Result<Pokemon, NetworkError>) -> ()
+
 class NetworkManager {
     static let shared = NetworkManager()
     var session: URLSession
@@ -20,65 +24,79 @@ class NetworkManager {
 }
 
 extension NetworkManager {
-    func fetchPokemonList(_ url: String, completion: @escaping (PokemonList?) -> ()){
-        guard let url = URL(string: url) else { return }
+    func fetchPokemonList(_ url: String, completion: @escaping ListHandler){
+        guard let url = URL(string: url) else {
+            completion(.failure(.badURL))
+            return
+        }
         self.session.dataTask(with: url) { (data, res, err) in
-                
-            guard
-                err == nil,
-                let data = data
-            else {
-               completion(nil)
+            if let err = err {
+                completion(.failure(.serverError(err.localizedDescription)))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.badData))
                return
             }
 
             do {
                 let list = try self.decoder.decode(PokemonList.self, from: data)
-                completion(list)
+                completion(.success(list))
             } catch {
-                print(error)
+                completion(.failure(.decodeError))
             }
-            
-            completion(nil)
         }.resume()
         
     }
     
-    func fetchPokemon(_ url: String, completion: @escaping (Pokemon?) -> ()) {
-        guard let url = URL(string: url) else { return }
+    func fetchPokemon(_ url: String, completion: @escaping PokemonTrainer) {
+        guard let url = URL(string: url) else {
+            completion(.failure(.badURL))
+            return
+        }
         self.session.dataTask(with: url) { (data, res, err) in
-               
-            guard
-                err == nil,
-                let data = data
-            else {
-                completion(nil)
+            if let err = err {
+                completion(.failure(.serverError(err.localizedDescription)))
                 return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.badData))
+               return
             }
 
             do {
                 let pokemon = try self.decoder.decode(Pokemon.self, from: data)
-                completion(pokemon)
+                completion(.success(pokemon))
             } catch {
-                print(error)
+                completion(.failure(.decodeError))
             }
-            
-            completion(nil)
         }.resume()
     }
     
-    func fetchSprite(_ url: String, completion: @escaping (UIImage?)->()) {
-        guard let url = URL(string: url) else { return }
+    func fetchSprite(_ url: String, completion: @escaping imgHandler) {
+        guard let url = URL(string: url) else {
+            completion(.failure(.badURL))
+            return
+        }
         self.session.dataTask(with: url) { (data, res, err) in
-            guard
-                err == nil,
-                let data = data,
-                let image = UIImage(data: data)
-            else {
-                completion(nil)
+            
+            if let err = err {
+                completion(.failure(.serverError(err.localizedDescription)))
                 return
             }
-            completion(image)
+            
+            guard let data = data else {
+                completion(.failure(.badData))
+               return
+            }
+            guard let image = UIImage(data: data) else {
+                completion(.failure(.badImage))
+                return
+            }
+            completion(.success(image))
+            
         }.resume()
     }
     
