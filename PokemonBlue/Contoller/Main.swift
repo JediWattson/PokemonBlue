@@ -32,12 +32,12 @@ class MainController: UIViewController {
     }
     
     private func setup(){
-        let path = Bundle.main.path(forResource: "Pokemon", ofType: "mp3")!
+        let path = Bundle.main.path(forResource: "Pokerap", ofType: "mp3")!
         let url = URL(fileURLWithPath: path)
 
         do {
             themeSong = try AVAudioPlayer(contentsOf: url)
-            //themeSong?.play()
+            themeSong?.play()
         } catch {
             print(error)
         }

@@ -24,6 +24,7 @@
 		0C27F31424D63D6C00F3218C /* Details.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C27F31324D63D6C00F3218C /* Details.swift */; };
 		0C27F33824D71D5E00F3218C /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C27F33724D71D5E00F3218C /* NetworkError.swift */; };
 		0C27F33A24D7227D00F3218C /* UIViewControler+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C27F33924D7227D00F3218C /* UIViewControler+Utils.swift */; };
+		0C27F33C24D727C200F3218C /* Pokerap.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0C27F33B24D727C200F3218C /* Pokerap.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		0C27F31324D63D6C00F3218C /* Details.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Details.swift; sourceTree = "<group>"; };
 		0C27F33724D71D5E00F3218C /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		0C27F33924D7227D00F3218C /* UIViewControler+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewControler+Utils.swift"; sourceTree = "<group>"; };
+		0C27F33B24D727C200F3218C /* Pokerap.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Pokerap.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 		0C27F30B24D5EB5A00F3218C /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				0C27F33B24D727C200F3218C /* Pokerap.mp3 */,
 				0C27F30C24D5EB7200F3218C /* Pokemon.mp3 */,
 			);
 			path = Audio;
@@ -218,6 +221,7 @@
 				0C27F2E324D50ADA00F3218C /* Assets.xcassets in Resources */,
 				0C27F30D24D5EB7200F3218C /* Pokemon.mp3 in Resources */,
 				0C27F30A24D5DAB800F3218C /* PokemonHollowNormal.ttf in Resources */,
+				0C27F33C24D727C200F3218C /* Pokerap.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

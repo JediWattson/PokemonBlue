@@ -60,7 +60,7 @@ class Details: UIViewController {
         guard let pokemon = self.pokemon else { return }
 
         mainImage.image = pokemon.image
-        nameLabel.text = pokemon.name
+        nameLabel.text = pokemon.name.capitalizingFirstLetter()
         
         vStackContainer.addArrangedSubview(nameLabel)
         vStackContainer.addArrangedSubview(mainImage)
