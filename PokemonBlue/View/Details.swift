@@ -13,7 +13,7 @@ class Details: UIViewController {
     lazy var vStackContainer: UIStackView = {
         let vStack = UIStackView(frame: .zero)
         vStack.translatesAutoresizingMaskIntoConstraints = false
-        vStack.distribution = .fill
+        vStack.distribution = .fillProportionally
         vStack.axis = .vertical
         return vStack
     }()
@@ -22,7 +22,7 @@ class Details: UIViewController {
         let hStack = UIStackView(frame: .zero)
         hStack.distribution = .fillEqually
         hStack.axis = .horizontal
-        hStack.spacing = 16
+        hStack.spacing = 8
         return hStack
     }()
     
@@ -71,7 +71,8 @@ class Details: UIViewController {
         self.view.addSubview(vStackContainer)
 
         guard let safeArea = self.view?.safeAreaLayoutGuide else { return }
-        nameLabel.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        mainImage.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        nameLabel.heightAnchor.constraint(equalToConstant: 40).isActive = true
         vStackContainer.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8).isActive = true
         vStackContainer.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8).isActive = true
         vStackContainer.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8).isActive = true
