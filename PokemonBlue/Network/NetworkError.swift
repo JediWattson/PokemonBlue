@@ -32,5 +32,4 @@ extension NetworkError: LocalizedError {
             return NSLocalizedString("The data recieved was not in the correct image format", comment: "Corrupt Image File")
         }
     }
-    
 }

@@ -19,7 +19,6 @@ class MainController: UIViewController {
             }
         }
     }
-    var pokemonFetched: [String: Pokemon] = [:]
     var limit: Int = 25
     var nextPage: String = "https://pokeapi.co/api/v2/pokemon?offset=0&limit="
     var previousPage: String?
@@ -88,19 +87,9 @@ extension MainController: UITableViewDataSource {
         
         NetworkManager.shared.fetchPokemon(url){result in
             switch result {
-            case .success(var pokemon):
-                guard let frontDefault = pokemon.sprites.frontDefault else {return}
-                NetworkManager.shared.fetchSprite(frontDefault){ result in
-                    switch result {
-                    case .success(let image):
-                        pokemon.image = image
-                        self.pokemonFetched[pokemon.name] = pokemon
-                        DispatchQueue.main.async {
-                            cell.setCell(pokemon)
-                        }
-                    case .failure(let error):
-                        self.presentAlert(error: error)
-                    }
+            case .success(let pokemon):
+                DispatchQueue.main.async {
+                    cell.setCell(pokemon)
                 }
             case .failure(let error):
                 self.presentAlert(error: error)
@@ -116,10 +105,18 @@ extension MainController: UITableViewDataSource {
 extension MainController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let name = self.pokemonFetches[indexPath.row].name
-        guard let pokemon = self.pokemonFetched[name] else {return}
-        let detail = Details(pokemon: pokemon)
-        self.navigationController?.pushViewController(detail, animated: true)
+        let url = pokemonFetches[indexPath.row].url
+        NetworkManager.shared.fetchPokemon(url){result in
+               switch result {
+               case .success(let pokemon):
+                   DispatchQueue.main.async {
+                       let detail = Details(pokemon: pokemon)
+                       self.navigationController?.pushViewController(detail, animated: true)
+                   }
+               case .failure(let error):
+                   self.presentAlert(error: error)
+               }
+           }
     }
 }
 
