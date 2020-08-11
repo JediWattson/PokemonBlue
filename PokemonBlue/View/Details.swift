@@ -41,7 +41,7 @@ class Details: UIViewController {
     lazy var mainImage: UIImageView = {
         let image = UIImageView(frame: .zero)
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.contentMode = .scaleAspectFit
+        image.contentMode = .scaleAspectFill
         return image
     }()
     
@@ -54,6 +54,9 @@ class Details: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var compact: [NSLayoutConstraint] = []
+    var regular: [NSLayoutConstraint] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -62,23 +65,71 @@ class Details: UIViewController {
         mainImage.image = pokemon.image
         nameLabel.text = pokemon.name.capitalizingFirstLetter()
         
-        vStackContainer.addArrangedSubview(nameLabel)
-        vStackContainer.addArrangedSubview(mainImage)
-        
         self.setupType()
         self.setupScroll()
         
+        self.view.addSubview(mainImage)
+        self.view.addSubview(nameLabel)
         self.view.addSubview(vStackContainer)
 
-        guard let safeArea = self.view?.safeAreaLayoutGuide else { return }
-        mainImage.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        nameLabel.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        vStackContainer.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8).isActive = true
-        vStackContainer.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8).isActive = true
-        vStackContainer.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8).isActive = true
-        vStackContainer.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -8).isActive = true
+        self.setupConstraints()
     }
     
+    private func setupConstraints(){
+        guard let safeArea = self.view?.safeAreaLayoutGuide else { return }
+        
+        compact.append(contentsOf: [
+            
+            nameLabel.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8),
+            mainImage.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8),
+            
+            vStackContainer.heightAnchor.constraint(greaterThanOrEqualTo: safeArea.heightAnchor, multiplier: 0.6),
+            vStackContainer.topAnchor.constraint(equalTo: self.mainImage.bottomAnchor, constant: -8),
+            vStackContainer.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8)
+        ])
+        
+        regular.append(contentsOf: [
+            nameLabel.trailingAnchor.constraint(equalTo: self.vStackContainer.leadingAnchor, constant: 8),
+            mainImage.trailingAnchor.constraint(equalTo: self.vStackContainer.leadingAnchor, constant: 8),
+
+            mainImage.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -8),
+            
+            vStackContainer.widthAnchor.constraint(greaterThanOrEqualTo: safeArea.widthAnchor, multiplier: 0.6),
+            vStackContainer.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8),
+            vStackContainer.trailingAnchor.constraint(equalTo: self.mainImage.trailingAnchor, constant: -8)
+        ])
+        
+        self.setOrientationConstraints()
+
+        NSLayoutConstraint.activate([
+            nameLabel.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8),
+            nameLabel.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8),
+            nameLabel.heightAnchor.constraint(equalToConstant: 70),
+            
+            mainImage.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            mainImage.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 8),
+            
+            vStackContainer.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -8),
+            vStackContainer.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -8)
+        ])
+
+        
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        self.setOrientationConstraints()
+    }
+    
+    private func setOrientationConstraints(){
+        if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+            NSLayoutConstraint.activate(compact)
+            NSLayoutConstraint.deactivate(regular)
+        } else {
+            NSLayoutConstraint.activate(regular)
+            NSLayoutConstraint.deactivate(compact)
+        }
+    }
+        
     private func setupType() {
         guard let pokemon = self.pokemon else { return }
         pokemon.types.forEach { val in
@@ -141,7 +192,7 @@ class Details: UIViewController {
             label.widthAnchor.constraint(equalToConstant: frame.width/2).isActive = true
         }
 
-        let contentViewSize = CGSize(width: frame.width/2, height: CGFloat(arr.count*20))
+        let contentViewSize = CGSize(width: frame.width*0.4 , height: CGFloat(arr.count*20))
         let scroll = UIScrollView(frame: .zero)
         scroll.frame = self.view.bounds
         scroll.contentSize = contentViewSize
