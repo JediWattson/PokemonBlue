@@ -1,0 +1,6 @@
+framework module Pods_PokemonBlue {
+  umbrella header "Pods-PokemonBlue-umbrella.h"
+
+  export *
+  module * { export * }
+}
