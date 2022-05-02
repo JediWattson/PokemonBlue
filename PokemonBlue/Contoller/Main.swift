@@ -12,7 +12,9 @@ import UIKit
 class MainController: UIViewController {
     var themeSong: AVAudioPlayer?
     var tableView: UITableView?
-    var pokemonFetches: [NameLink] = [] {
+    var count = 151
+    
+    var pokemonFetches: [Int: NameLink] = [:] {
         didSet {
             DispatchQueue.main.async {
                 self.tableView?.reloadData()
@@ -63,29 +65,34 @@ class MainController: UIViewController {
             case .success(let pokemon):
                 self.previousPage = pokemon.previous ?? self.previousPage
                 self.nextPage = pokemon.next ?? self.nextPage
-                self.pokemonFetches.append(contentsOf: pokemon.results)
+                
+                var id = self.pokemonFetches.count
+                pokemon.results.forEach { pokemon in
+                    self.pokemonFetches[id] = pokemon
+                    id += 1
+                }
+
             case .failure(let error):
                 self.presentAlert(error: error)
             }
-            
+
         }
     }
 }
 
 extension MainController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.pokemonFetches.count
+        pokemonFetches.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseId, for: indexPath) as? Cell
+        guard
+            let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseId, for: indexPath) as? Cell,
+            let urlString = pokemonFetches[indexPath.row]?.url
         else { return UITableViewCell() }
-        
-        let url = pokemonFetches[indexPath.row].url
-
         cell.clearCell()
         
-        NetworkManager.shared.fetchPokemon(url){result in
+        NetworkManager.shared.fetchPokemon(urlString){result in
             switch result {
             case .success(let pokemon):
                 DispatchQueue.main.async {
@@ -95,9 +102,13 @@ extension MainController: UITableViewDataSource {
                 self.presentAlert(error: error)
             }
         }
-        
         return cell
-        
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseId, for: indexPath) as? Cell
+        else { return }
+        cell.clearCell()
     }
 
 }
@@ -105,8 +116,9 @@ extension MainController: UITableViewDataSource {
 extension MainController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let url = pokemonFetches[indexPath.row].url
-        NetworkManager.shared.fetchPokemon(url){result in
+        
+        guard let urlString = pokemonFetches[indexPath.row]?.url else { return }
+        NetworkManager.shared.fetchPokemon(urlString){result in
                switch result {
                case .success(let pokemon):
                    DispatchQueue.main.async {
