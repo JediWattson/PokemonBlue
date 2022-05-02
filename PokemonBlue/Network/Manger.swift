@@ -6,6 +6,7 @@
 //  Copyright © 2020 JediWattson. All rights reserved.
 //
 
+import UIKit
 import Alamofire
 
 typealias ListHandler = (Result<PokemonList, NetworkError>) -> ()
